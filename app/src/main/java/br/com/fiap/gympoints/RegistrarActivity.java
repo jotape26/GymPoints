@@ -18,6 +18,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -34,7 +35,7 @@ import br.com.fiap.gympoints.Model.Cliente;
 public class RegistrarActivity extends AppCompatActivity {
 
     private RequestQueue requestQueue;
-    private StringRequest request;
+    private JsonObjectRequest request;
     private EditText txtNome;
     private EditText txtCpf;
     private EditText txtEmail;
@@ -75,15 +76,26 @@ public class RegistrarActivity extends AppCompatActivity {
 
     private void registrar(final Cliente cliente) {
         requestQueue = Volley.newRequestQueue(getApplicationContext());
+        JSONObject jsonObject = new JSONObject();
 
-        request = new StringRequest(Request.Method.POST, Conexao.instanceURL+"/services/data/v43.0/sobjects/Cliente__c", new Response.Listener<String>() {
+        try{
+            jsonObject.put("nome__c", cliente.getNome());
+            jsonObject.put("cpf__c", cliente.getCpf());
+            jsonObject.put("email__c", cliente.getEmail());
+            jsonObject.put("senha__c", cliente.getSenha());
+            jsonObject.put("idade__c", cliente.getIdade());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        request = new JsonObjectRequest(Request.Method.POST, Conexao.instanceURL+"/services/data/v43.0/sobjects/Cliente__c", jsonObject, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(JSONObject response) {
 
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
 
-                Log.d("Response", response);
+                Log.d("Response", response.toString());
 
             }
         }, new Response.ErrorListener() {
@@ -102,18 +114,18 @@ public class RegistrarActivity extends AppCompatActivity {
 
         }) {
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                //Parametros que serão enviados no Body da requisição como JSON
-                params.put("nome__c", cliente.getNome());
-                params.put("cpf__c", cliente.getCpf());
-                params.put("email__c", cliente.getEmail());
-                params.put("senha__c", cliente.getSenha());
-                params.put("idade__c", cliente.getIdade().toString());
-
-                return params;
-            }
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//                Map<String, String> params = new HashMap<String, String>();
+//                //Parametros que serão enviados no Body da requisição como JSON
+//                params.put("nome__c", cliente.getNome());
+//                params.put("cpf__c", cliente.getCpf());
+//                params.put("email__c", cliente.getEmail());
+//                params.put("senha__c", cliente.getSenha());
+//                params.put("idade__c", String.valueOf(cliente.getIdade()));
+//
+//                return params;
+//            }
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -124,7 +136,6 @@ public class RegistrarActivity extends AppCompatActivity {
                 header.put("Content-Type", "application/json");
                 return header;
             }
-
 
         };
 
