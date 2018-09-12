@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_light"
+    tools:context=".fragment.SobreFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/sobre_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/gp_logo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.076" />
+
+        <TextView
+            android:id="@+id/txt_sobre"
+            android:layout_width="0dp"
+            android:layout_height="246dp"
+            android:layout_margin="12dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:padding="8dp"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dignissim ex sed sagittis feugiat. Pellentesque quis leo nibh. Sed sit amet convallis magna. Fusce eu ligula eget eros sollicitudin dapibus. Sed cursus euismod arcu. Suspendisse imperdiet orci a purus iaculis vulputate. Fusce tempor metus nec felis gravida eleifend. Phasellus id pellentesque velit, ac auctor diam. Suspendisse ut tincidunt libero. Mauris eros velit, feugiat commodo dui at, imperdiet consequat justo. Nam bibendum vehicula fermentum. Maecenas est tortor, venenatis quis dictum vel, posuere ac nibh. Etiam placerat nisi eget hendrerit congue. Vestibulum aliquet eleifend tempor."
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.445" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:gravity="end"
+            android:text="Daniel Kiesshau RM76407\nJéssica da Silva Santana RM76756\nJoão Pedro Leite RM75793\nWesley Fuzii RM76297"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_sobre"
+            app:layout_constraintVertical_bias="0.357" />
+    </android.support.constraint.ConstraintLayout>
+</FrameLayout>
