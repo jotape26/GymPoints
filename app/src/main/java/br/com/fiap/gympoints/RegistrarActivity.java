@@ -1,74 +1,140 @@
 package br.com.fiap.gympoints;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.fiap.gympoints.Model.Cliente;
+
 public class RegistrarActivity extends AppCompatActivity {
 
-
-    private static final String URL = "https://login.salesforce.com/services/oauth2/token";
     private RequestQueue requestQueue;
-    private StringRequest request;
+    private JsonObjectRequest request;
+    private EditText txtNome;
+    private EditText txtCpf;
+    private EditText txtEmail;
+    private EditText txtIdade;
+    private EditText txtSenha;
+    private Button btnRegistrar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrar);
-        requestQueue = Volley.newRequestQueue(getApplicationContext());
+        Conexao conexao = new Conexao();
+        conexao.autenticacao(getApplicationContext());
 
+        txtNome = findViewById(R.id.txtNome);
+        txtCpf = findViewById(R.id.txtCPF);
+        txtEmail = findViewById(R.id.txtEmail);
+        txtSenha = findViewById(R.id.txtSenha);
+        txtIdade = findViewById(R.id.txtIdade);
+        btnRegistrar = findViewById(R.id.btnRegistrar);
 
-        //Autenticação
-        autenticacao();
+        btnRegistrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Pega valores do novo cliente
+                String nome = txtNome.getText().toString();
+                String cpf = txtCpf.getText().toString();
+                String email = txtEmail.getText().toString();
+                String senha = txtSenha.getText().toString();
+                Integer idade = Integer.parseInt(txtIdade.getText().toString());
+
+                Cliente cliente = new Cliente(nome, cpf, email, senha, idade);
+                registrar(cliente);
+            }
+        });
+
     }
 
-    public void autenticacao(){
-        request = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+    private void registrar(final Cliente cliente) {
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
+        JSONObject jsonObject = new JSONObject();
+
+        try{
+            jsonObject.put("nome__c", cliente.getNome());
+            jsonObject.put("cpf__c", cliente.getCpf());
+            jsonObject.put("email__c", cliente.getEmail());
+            jsonObject.put("senha__c", cliente.getSenha());
+            jsonObject.put("idade__c", cliente.getIdade());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        request = new JsonObjectRequest(Request.Method.POST, Conexao.instanceURL+"/services/data/v43.0/sobjects/Cliente__c", jsonObject, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(JSONObject response) {
 
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
-                Log.d("Response", response);
 
+                Log.d("Response", response.toString());
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                Log.d("Error.Response", "");
-
+                String body = null;
+                String statusCode = String.valueOf(error.networkResponse.statusCode);
+                Log.d("Status_Code", statusCode.toString());
+                //Pega o body e converte para String
+                NetworkResponse networkResponse = error.networkResponse;
+                if (networkResponse != null && networkResponse.data != null) {
+                    String jsonError = new String(networkResponse.data);
+                    Log.d("json_error", jsonError);
+                }
             }
 
         }) {
 
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//                Map<String, String> params = new HashMap<String, String>();
+//                //Parametros que serão enviados no Body da requisição como JSON
+//                params.put("nome__c", cliente.getNome());
+//                params.put("cpf__c", cliente.getCpf());
+//                params.put("email__c", cliente.getEmail());
+//                params.put("senha__c", cliente.getSenha());
+//                params.put("idade__c", String.valueOf(cliente.getIdade()));
+//
+//                return params;
+//            }
+
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params  = new HashMap<String, String>();
-                params.put("grant_type", "password");
-                params.put("client_id", "3MVG9dZJodJWITSsLl9Gbw5MqpTFalnkZeSE42RMZg6I15UwjjlEqvwgDRnIIOWLYsBtiXTpcXFDuDzLadPSl");
-                params.put("client_secret", "8847434933220872042");
-                params.put("username", "membro@gympoints.com");
-                params.put("password", "userGYMPOINTS7hzngV7xOYqzO7B4mFTW6Mhu0w"); //Password+Security token
-                return params;
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> header = new HashMap<String, String>();
+                //Configuração solicitada pela SF para ter acesso ao SF
+                header.put("Authorization", "Bearer "+ Conexao.accessToken);
+                //Define o tipo de conteúdo que está sendo enviado
+                header.put("Content-Type", "application/json");
+                return header;
             }
 
         };
