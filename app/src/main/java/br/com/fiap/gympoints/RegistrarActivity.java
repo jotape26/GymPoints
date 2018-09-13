@@ -47,9 +47,6 @@ public class RegistrarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrar);
-        Conexao conexao = new Conexao();
-        conexao.autenticacao(getApplicationContext());
-
         txtNome = findViewById(R.id.txtNome);
         txtCpf = findViewById(R.id.txtCPF);
         txtEmail = findViewById(R.id.txtEmail);
@@ -113,19 +110,6 @@ public class RegistrarActivity extends AppCompatActivity {
             }
 
         }) {
-
-//            @Override
-//            protected Map<String, String> getParams() throws AuthFailureError {
-//                Map<String, String> params = new HashMap<String, String>();
-//                //Parametros que serão enviados no Body da requisição como JSON
-//                params.put("nome__c", cliente.getNome());
-//                params.put("cpf__c", cliente.getCpf());
-//                params.put("email__c", cliente.getEmail());
-//                params.put("senha__c", cliente.getSenha());
-//                params.put("idade__c", String.valueOf(cliente.getIdade()));
-//
-//                return params;
-//            }
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
