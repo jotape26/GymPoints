@@ -22,11 +22,10 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import br.com.fiap.gympoints.DAO.Conexao;
 import br.com.fiap.gympoints.Model.Cliente;
 
 public class LoginActivity extends AppCompatActivity {
@@ -44,8 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.login_activity);
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
-        Conexao conexao = new Conexao();
-        conexao.autenticacao(getApplicationContext());
+        Conexao.autenticacao(getApplicationContext());
         requestQueue = Volley.newRequestQueue(getApplicationContext());
         txtEmail = findViewById(R.id.txtUsuario);
         txtSenha = findViewById(R.id.txtSenha);
