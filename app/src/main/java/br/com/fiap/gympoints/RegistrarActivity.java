@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.fiap.gympoints.DAO.ClienteDAO;
 import br.com.fiap.gympoints.DAO.Conexao;
 import br.com.fiap.gympoints.Model.Cliente;
 
@@ -59,64 +60,10 @@ public class RegistrarActivity extends AppCompatActivity {
                 Integer idade = Integer.parseInt(txtIdade.getText().toString());
 
                 Cliente cliente = new Cliente(nome, cpf, email, senha, idade);
-                registrar(cliente);
+                ClienteDAO dao = new ClienteDAO(getApplicationContext(), getWindow().getDecorView().getRootView());
+                dao.registrar(cliente);
             }
         });
 
-    }
-
-    private void registrar(final Cliente cliente) {
-        requestQueue = Volley.newRequestQueue(getApplicationContext());
-        JSONObject jsonObject = new JSONObject();
-
-        try{
-            jsonObject.put("nome__c", cliente.getNome());
-            jsonObject.put("cpf__c", cliente.getCpf());
-            jsonObject.put("email__c", cliente.getEmail());
-            jsonObject.put("senha__c", cliente.getSenha());
-            jsonObject.put("idade__c", cliente.getIdade());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        request = new JsonObjectRequest(Request.Method.POST, Conexao.instanceURL+"/services/data/v43.0/sobjects/Cliente__c", jsonObject, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-
-                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                StrictMode.setThreadPolicy(policy);
-
-                Log.d("Response", response.toString());
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                String body = null;
-                String statusCode = String.valueOf(error.networkResponse.statusCode);
-                Log.d("Status_Code", statusCode.toString());
-                //Pega o body e converte para String
-                NetworkResponse networkResponse = error.networkResponse;
-                if (networkResponse != null && networkResponse.data != null) {
-                    String jsonError = new String(networkResponse.data);
-                    Log.d("json_error", jsonError);
-                }
-            }
-
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> header = new HashMap<String, String>();
-                //Configuração solicitada pela SF para ter acesso ao SF
-                header.put("Authorization", "Bearer "+ Conexao.accessToken);
-                //Define o tipo de conteúdo que está sendo enviado
-                header.put("Content-Type", "application/json");
-                return header;
-            }
-
-        };
-
-        requestQueue.add(request);
     }
 }
