@@ -1,4 +1,4 @@
-package br.com.fiap.gympoints;
+package br.com.fiap.gympoints.DAO;
 
 import android.content.Context;
 import android.os.StrictMode;
@@ -17,14 +17,14 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Conexao {
+public abstract class Conexao {
     public static String accessToken;
     public static String instanceURL;
     private static final String URL = "https://login.salesforce.com/services/oauth2/token";
-    private RequestQueue requestQueue;
-    private StringRequest request;
+    private static  RequestQueue requestQueue;
+    private static StringRequest request;
 
-    public void autenticacao(Context context) {
+    public static void autenticacao(Context context) {
         requestQueue = Volley.newRequestQueue(context);
         request = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override

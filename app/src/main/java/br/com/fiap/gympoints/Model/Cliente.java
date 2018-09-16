@@ -15,6 +15,11 @@ public class Cliente {
         this.idade = idade;
     }
 
+    public Cliente(String email, String senha) {
+        this.email = email;
+        this.senha = senha;
+    }
+
     public String getNome() {
         return nome;
     }

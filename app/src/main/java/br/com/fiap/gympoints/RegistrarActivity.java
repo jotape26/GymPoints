@@ -1,8 +1,5 @@
 package br.com.fiap.gympoints;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,24 +9,21 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.fiap.gympoints.DAO.Conexao;
 import br.com.fiap.gympoints.Model.Cliente;
 
 public class RegistrarActivity extends AppCompatActivity {
@@ -47,9 +41,6 @@ public class RegistrarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrar);
-        Conexao conexao = new Conexao();
-        conexao.autenticacao(getApplicationContext());
-
         txtNome = findViewById(R.id.txtNome);
         txtCpf = findViewById(R.id.txtCPF);
         txtEmail = findViewById(R.id.txtEmail);
@@ -113,19 +104,6 @@ public class RegistrarActivity extends AppCompatActivity {
             }
 
         }) {
-
-//            @Override
-//            protected Map<String, String> getParams() throws AuthFailureError {
-//                Map<String, String> params = new HashMap<String, String>();
-//                //Parametros que serão enviados no Body da requisição como JSON
-//                params.put("nome__c", cliente.getNome());
-//                params.put("cpf__c", cliente.getCpf());
-//                params.put("email__c", cliente.getEmail());
-//                params.put("senha__c", cliente.getSenha());
-//                params.put("idade__c", String.valueOf(cliente.getIdade()));
-//
-//                return params;
-//            }
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
