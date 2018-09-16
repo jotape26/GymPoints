@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import br.com.fiap.gympoints.DAO.Conexao;
 import br.com.fiap.gympoints.adapter.PresencaAdapter;
 import br.com.fiap.gympoints.fragment.LojaFragment;
 import br.com.fiap.gympoints.fragment.PresencaFragment;
@@ -161,7 +162,7 @@ public class MainActivity extends AppCompatActivity
         builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish();
             }
         });
         builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {

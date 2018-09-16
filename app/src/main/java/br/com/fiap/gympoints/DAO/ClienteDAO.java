@@ -47,7 +47,7 @@ public class ClienteDAO {
     public void login(final Cliente cliente){
         requestQueue = Volley.newRequestQueue(context);
         String query = "q=SELECT senha__c FROM Cliente__c WHERE email__c ='" + cliente.getEmail() + "'";
-        request = new com.android.volley.toolbox.StringRequest(com.android.volley.Request.Method.GET, Conexao.instanceURL + epQuery + query, new Response.Listener<String>() {
+        request = new StringRequest(com.android.volley.Request.Method.GET, Conexao.instanceURL + epQuery + query, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -65,6 +65,10 @@ public class ClienteDAO {
                     JSONObject data = auth.getJSONObject(0);
                     // Pega a senha do JSON final, já que filtramos a query pelo email e retornou um Cliente
                     String senhaSF = data.getString("senha__c");
+                    // Extraindo attributes porque no atributo url tem o clientID usado para manipular o registro da conta logada
+                    JSONObject atributes = data.getJSONObject("attributes");
+                    Conexao.clientID = atributes.getString("url").substring(41);
+                    Log.d("Clien ID", Conexao.clientID);
 
                     // Valida Senha inserida com a recebida pelo SF
                     if (cliente.getSenha().toString().equals(senhaSF)) {
@@ -150,4 +154,5 @@ public class ClienteDAO {
 
         requestQueue.add(jsonRequest);
     }
+
 }

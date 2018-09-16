@@ -20,6 +20,7 @@ import java.util.Map;
 public abstract class Conexao {
     public static String accessToken;
     public static String instanceURL;
+    public static String clientID; // Usado
     private static final String URL = "https://login.salesforce.com/services/oauth2/token";
     private static  RequestQueue requestQueue;
     private static StringRequest request;
