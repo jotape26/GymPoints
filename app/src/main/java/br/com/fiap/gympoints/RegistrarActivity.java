@@ -28,9 +28,6 @@ import br.com.fiap.gympoints.DAO.Conexao;
 import br.com.fiap.gympoints.Model.Cliente;
 
 public class RegistrarActivity extends AppCompatActivity {
-
-    private RequestQueue requestQueue;
-    private JsonObjectRequest request;
     private EditText txtNome;
     private EditText txtCpf;
     private EditText txtEmail;
@@ -60,7 +57,7 @@ public class RegistrarActivity extends AppCompatActivity {
                 Integer idade = Integer.parseInt(txtIdade.getText().toString());
 
                 Cliente cliente = new Cliente(nome, cpf, email, senha, idade);
-                ClienteDAO dao = new ClienteDAO(getApplicationContext(), getWindow().getDecorView().getRootView());
+                ClienteDAO dao = new ClienteDAO(getApplicationContext(), findViewById(android.R.id.content));
                 dao.registrar(cliente);
             }
         });
