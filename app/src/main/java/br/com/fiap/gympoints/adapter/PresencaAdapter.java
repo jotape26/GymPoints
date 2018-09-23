@@ -10,9 +10,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import br.com.fiap.gympoints.Model.Presenca;
 import br.com.fiap.gympoints.R;
-import br.com.fiap.gympoints.model.Presenca;
-import br.com.fiap.gympoints.model.Produto;
+import br.com.fiap.gympoints.Model.Presenca;
+import br.com.fiap.gympoints.Model.Produto;
 
 public class PresencaAdapter extends BaseAdapter {
 

@@ -22,7 +22,7 @@ import br.com.fiap.gympoints.LoginActivity;
 import br.com.fiap.gympoints.MainActivity;
 import br.com.fiap.gympoints.R;
 import br.com.fiap.gympoints.adapter.ProdutoAdapter;
-import br.com.fiap.gympoints.model.Produto;
+import br.com.fiap.gympoints.Model.Produto;
 
 /**
  * A simple {@link Fragment} subclass.

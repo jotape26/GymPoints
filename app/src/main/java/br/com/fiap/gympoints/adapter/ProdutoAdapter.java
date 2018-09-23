@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import br.com.fiap.gympoints.R;
-import br.com.fiap.gympoints.model.Produto;
+import br.com.fiap.gympoints.Model.Produto;
 
 public class ProdutoAdapter extends BaseAdapter {
 

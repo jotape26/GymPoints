@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 import br.com.fiap.gympoints.R;
 import br.com.fiap.gympoints.adapter.PresencaAdapter;
-import br.com.fiap.gympoints.model.Presenca;
+import br.com.fiap.gympoints.Model.Presenca;
 
 
 /**

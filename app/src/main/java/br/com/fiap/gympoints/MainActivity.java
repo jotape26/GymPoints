@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -23,14 +24,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import br.com.fiap.gympoints.DAO.ClienteDAO;
 import br.com.fiap.gympoints.DAO.Conexao;
+import br.com.fiap.gympoints.Model.Cliente;
+import br.com.fiap.gympoints.Model.Frequencia;
+import br.com.fiap.gympoints.Model.Presenca;
 import br.com.fiap.gympoints.adapter.PresencaAdapter;
 import br.com.fiap.gympoints.fragment.LojaFragment;
 import br.com.fiap.gympoints.fragment.PresencaFragment;
 import br.com.fiap.gympoints.fragment.RankingFragment;
 import br.com.fiap.gympoints.fragment.SobreFragment;
-import br.com.fiap.gympoints.model.Presenca;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -49,6 +54,13 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
+
+        ClienteDAO dao = new ClienteDAO(getApplicationContext());
+        dao.getFrequencias();
+
+        Log.d("MAIN", ClienteDAO.inteiros.size()+"");
+        Log.d("MAIN FREQ", ClienteDAO.frequencias.size()+"");
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(

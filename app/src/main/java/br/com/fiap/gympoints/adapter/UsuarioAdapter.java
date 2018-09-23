@@ -11,8 +11,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import br.com.fiap.gympoints.R;
-import br.com.fiap.gympoints.model.Produto;
-import br.com.fiap.gympoints.model.Usuario;
+import br.com.fiap.gympoints.Model.Produto;
+import br.com.fiap.gympoints.Model.Usuario;
 
 public class UsuarioAdapter extends BaseAdapter {
 

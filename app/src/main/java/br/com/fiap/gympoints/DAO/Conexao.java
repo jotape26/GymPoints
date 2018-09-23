@@ -17,10 +17,12 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.fiap.gympoints.Model.Cliente;
+
 public abstract class Conexao {
     public static String accessToken;
     public static String instanceURL;
-    public static String clientID; // Usado
+    public static String clientID;
     private static final String URL = "https://login.salesforce.com/services/oauth2/token";
     private static  RequestQueue requestQueue;
     private static StringRequest request;
@@ -43,7 +45,6 @@ public abstract class Conexao {
                     //Define token de acesso para utilizar no app a cada requisição
                     Conexao.accessToken = jsonResponse.getString("access_token");
                     Conexao.instanceURL = jsonResponse.getString("instance_url");
-
 
                 } catch (Exception e) {
                     e.printStackTrace();

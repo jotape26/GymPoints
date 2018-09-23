@@ -1,4 +1,4 @@
-package br.com.fiap.gympoints.model;
+package br.com.fiap.gympoints.Model;
 
 import java.io.Serializable;
 
