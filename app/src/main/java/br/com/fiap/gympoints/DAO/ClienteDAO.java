@@ -1,5 +1,6 @@
 package br.com.fiap.gympoints.DAO;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.StrictMode;
 import android.support.design.widget.Snackbar;
@@ -85,7 +86,7 @@ public class ClienteDAO {
                     Log.d("Client ID", Conexao.clientID);
                     // Valida Senha inserida com a recebida pelo SF
                     if (cliente.getSenha().toString().equals(senhaSF)) {
-                        context.startActivity(new Intent(context, br.com.fiap.gympoints.MainActivity.class));
+                        context.startActivity(new Intent(context, br.com.fiap.gympoints.MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                     } else {
                         Snackbar.make(v, "Login ou senha inválidos", Snackbar.LENGTH_SHORT).show();
                     }
@@ -134,7 +135,7 @@ public class ClienteDAO {
                 StrictMode.setThreadPolicy(policy);
                 Snackbar.make(v, "Registro concluído com sucesso", Snackbar.LENGTH_SHORT).show();
                 Log.d("Response", response.toString());
-
+                login(cliente);
             }
         }, new Response.ErrorListener() {
             @Override

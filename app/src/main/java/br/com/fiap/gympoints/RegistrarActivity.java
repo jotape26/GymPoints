@@ -1,5 +1,7 @@
 package br.com.fiap.gympoints;
 
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

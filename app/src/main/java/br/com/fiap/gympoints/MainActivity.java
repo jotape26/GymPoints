@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private ArrayList<Presenca> presencas;
+    private TextView txt_usuario;
+    private TextView txt_points;
     private ListView listView;
     private AlertDialog alerta;
     private AlertDialog alerta_token;
@@ -51,15 +53,18 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        TextView txt_usuario = (TextView) findViewById(R.id.txt_usuario);
+        TextView txt_points = (TextView) findViewById(R.id.txt_points);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
 
+
         ClienteDAO dao = new ClienteDAO(getApplicationContext());
         dao.getFrequencias();
 
-        Log.d("MAIN FREQ", ClienteDAO.frequencias.size()+"");
-        Log.d("MAIN PONTOS", ClienteDAO.clienteAtual.getPontos()+"");
+        txt_usuario.setText("Olá " + ClienteDAO.clienteAtual.getNome());
+        txt_points.setText("Você possui "+ ClienteDAO.clienteAtual.getPontos().toString() + " G-Points!");
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -174,7 +179,7 @@ public class MainActivity extends AppCompatActivity
         builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                finish();
+                startActivity(new Intent(getApplicationContext(), br.com.fiap.gympoints.LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
             }
         });
         builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
