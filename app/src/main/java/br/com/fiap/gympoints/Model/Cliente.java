@@ -9,7 +9,7 @@ public class Cliente {
     private String email;
     private String senha;
     private Integer idade;
-    private List<Frequencia> frequencias = new ArrayList<>();
+    private Integer pontos;
 
     public Cliente(){};
     public Cliente(String nome, String cpf, String email, String senha, Integer idade) {
@@ -20,18 +20,17 @@ public class Cliente {
         this.idade = idade;
     }
 
-    public Cliente(String email, String senha) {
-        this.email = email;
-        this.senha = senha;
-    }
-
-    public Cliente(String nome, String cpf, String email, String senha, Integer idade, List<Frequencia> frequencias) {
+    public Cliente(String nome, String cpf, String email,  Integer idade, Integer pontos) {
         this.nome = nome;
         this.cpf = cpf;
         this.email = email;
-        this.senha = senha;
         this.idade = idade;
-        this.frequencias = new ArrayList<>(frequencias);
+        this.pontos = pontos;
+    }
+
+    public Cliente(String email, String senha) {
+        this.email = email;
+        this.senha = senha;
     }
 
     public String getNome() {
@@ -74,11 +73,11 @@ public class Cliente {
         this.idade = idade;
     }
 
-    public List<Frequencia> getFrequencias() {
-        return frequencias;
+    public Integer getPontos() {
+        return pontos;
     }
 
-    public void setFrequencias(List<Frequencia> frequencias) {
-        this.frequencias = new ArrayList<>(frequencias);
+    public void setPontos(Integer pontos) {
+        this.pontos = pontos;
     }
 }

@@ -58,8 +58,8 @@ public class MainActivity extends AppCompatActivity
         ClienteDAO dao = new ClienteDAO(getApplicationContext());
         dao.getFrequencias();
 
-        Log.d("MAIN", ClienteDAO.inteiros.size()+"");
         Log.d("MAIN FREQ", ClienteDAO.frequencias.size()+"");
+        Log.d("MAIN PONTOS", ClienteDAO.clienteAtual.getPontos()+"");
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
