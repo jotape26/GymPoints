@@ -32,7 +32,6 @@ import br.com.fiap.gympoints.Model.Frequencia;
 
 public class ClienteDAO {
     public static Cliente clienteAtual = new Cliente();
-    public static final List<Frequencia> frequencias = new ArrayList<>();
     private RequestQueue requestQueue;
     private StringRequest request;
     private JsonObjectRequest jsonRequest;
@@ -175,7 +174,8 @@ public class ClienteDAO {
 
     // 2. Pegar Frequências do SF e seta na variável de Conexão do Cliente atual logado
     // (Parâmetro Boolean getAll para retornar 5 ultimas presenças ou todas)
-    public void getFrequencias(){
+    public Boolean getFrequencias(){
+        Boolean result = false;
         requestQueue = Volley.newRequestQueue(context);
         String query;
         query = "q=SELECT dataRegistro__c FROM Frequencia__c WHERE nomeCliente__c='"+ClienteDAO.clienteAtual.getNome()+"'";
@@ -195,26 +195,26 @@ public class ClienteDAO {
                         throw new Exception("Comece a frequentar a academia para ganhar pontos!");
                     }
 
-                    if(records.length() != ClienteDAO.frequencias.size() ) {
+                    if(records.length() != ClienteDAO.clienteAtual.getFrequencia().size() ) {
                         for (int i = 0; i < records.length(); i++) {
                             try {
                                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                                 String string = records.getJSONObject(i).getString("dataRegistro__c");
                                 Date data = formatter.parse(string);
                                 Frequencia frequencia = new Frequencia(data);
-                                ClienteDAO.frequencias.add(frequencia);
+                                ClienteDAO.clienteAtual.getFrequencia().add(frequencia);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
                     }
-
-                    Log.d("ANONY FREQ", ClienteDAO.frequencias.size()+"");
+                    Log.d("ANONY FREQ", ClienteDAO.clienteAtual.getFrequencia().size()+"");
 
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d("Error", e.getMessage());
                 }
+
                 Log.d("Success query", response);
             }
 
@@ -233,7 +233,9 @@ public class ClienteDAO {
                 return header;
             }
         };
+        result = true;
         requestQueue.add(request);
+        return result;
     }
 
     //Métodos para a Tela de Loja

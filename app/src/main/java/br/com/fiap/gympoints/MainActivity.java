@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity
 
 
         ClienteDAO dao = new ClienteDAO(getApplicationContext());
-        dao.getFrequencias();
 
         txt_usuario.setText("Olá " + ClienteDAO.clienteAtual.getNome());
         txt_points.setText("Você possui "+ ClienteDAO.clienteAtual.getPontos().toString() + " G-Points!");
@@ -75,6 +74,12 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        while(!dao.getFrequencias()){
+            Log.d("AWAIT", ClienteDAO.clienteAtual.getFrequencia().size()+ "");
+        }
+
+        Log.d("ANONY FREQ MAIN", ClienteDAO.clienteAtual.getFrequencia().toString());
 
         presencas = new ArrayList<Presenca>();
         presencas.add(new Presenca("11/09/2018", 25));
