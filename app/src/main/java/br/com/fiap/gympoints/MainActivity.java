@@ -3,7 +3,6 @@ package br.com.fiap.gympoints;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.design.widget.NavigationView;
@@ -26,9 +25,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.fiap.gympoints.Controller.PresencaController;
+import br.com.fiap.gympoints.Controller.ServerCallback;
 import br.com.fiap.gympoints.DAO.ClienteDAO;
-import br.com.fiap.gympoints.DAO.Conexao;
-import br.com.fiap.gympoints.Model.Cliente;
 import br.com.fiap.gympoints.Model.Frequencia;
 import br.com.fiap.gympoints.Model.Presenca;
 import br.com.fiap.gympoints.adapter.PresencaAdapter;
@@ -40,7 +39,7 @@ import br.com.fiap.gympoints.fragment.SobreFragment;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private ArrayList<Presenca> presencas;
+    private List<Presenca> presencas = new ArrayList<Presenca>();
     private TextView txt_usuario;
     private TextView txt_points;
     private ListView listView;
@@ -50,6 +49,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ClienteDAO dao = new ClienteDAO(getApplicationContext());
+        final PresencaController FC = new PresencaController();
+        dao.getPresencas(FC);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -59,8 +61,6 @@ public class MainActivity extends AppCompatActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
 
-
-        ClienteDAO dao = new ClienteDAO(getApplicationContext());
 
         txt_usuario.setText("Olá " + ClienteDAO.clienteAtual.getNome());
         txt_points.setText("Você possui "+ ClienteDAO.clienteAtual.getPontos().toString() + " G-Points!");
@@ -75,16 +75,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        while(!dao.getFrequencias()){
-            Log.d("AWAIT", ClienteDAO.clienteAtual.getFrequencia().size()+ "");
-        }
 
-        Log.d("ANONY FREQ MAIN", ClienteDAO.clienteAtual.getFrequencia().toString());
-
-        presencas = new ArrayList<Presenca>();
-        presencas.add(new Presenca("11/09/2018", 25));
-        presencas.add(new Presenca("10/09/2018", 25));
-        presencas.add(new Presenca("09/09/2018", 25));
+        presencas = new PresencaController().getPresencas();
+//        presencas.add(new Presenca("11/09/2018", 25));
+//        presencas.add(new Presenca("10/09/2018", 25));
+//        presencas.add(new Presenca("09/09/2018", 25));
 
         PresencaAdapter adapter = new PresencaAdapter(MainActivity.this, presencas);
         listView = findViewById(R.id.ultimas_presencas);

@@ -1,22 +1,27 @@
 package br.com.fiap.gympoints.Model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class Presenca implements Serializable {
-    private String dia;
-    private Integer pontos;
+    private Date data;
+    private Integer pontos = 25;
 
-    public Presenca(String dia, Integer pontos) {
-        this.dia = dia;
+    public Presenca(Date data, Integer pontos) {
+        this.data = data;
         this.pontos = pontos;
     }
 
-    public String getDia() {
-        return dia;
+    public Presenca(Date data) {
+        this.data = data;
     }
 
-    public void setDia(String dia) {
-        this.dia = dia;
+    public Date getDia() {
+        return data;
+    }
+
+    public void setDia(Date data) {
+        this.data = data;
     }
 
     public Integer getPontos() {

@@ -1,6 +1,5 @@
 package br.com.fiap.gympoints.DAO;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.StrictMode;
 import android.support.design.widget.Snackbar;
@@ -27,11 +26,16 @@ import java.util.List;
 import java.util.Map;
 import com.android.volley.toolbox.Volley;
 
+import br.com.fiap.gympoints.Controller.PresencaController;
+import br.com.fiap.gympoints.Controller.ServerCallback;
+import br.com.fiap.gympoints.MainActivity;
 import br.com.fiap.gympoints.Model.Cliente;
 import br.com.fiap.gympoints.Model.Frequencia;
+import br.com.fiap.gympoints.Model.Presenca;
 
 public class ClienteDAO {
     public static Cliente clienteAtual = new Cliente();
+    private final List<Presenca> presencas = new ArrayList<Presenca>();
     private RequestQueue requestQueue;
     private StringRequest request;
     private JsonObjectRequest jsonRequest;
@@ -174,15 +178,14 @@ public class ClienteDAO {
 
     // 2. Pegar Frequências do SF e seta na variável de Conexão do Cliente atual logado
     // (Parâmetro Boolean getAll para retornar 5 ultimas presenças ou todas)
-    public Boolean getFrequencias(){
-        Boolean result = false;
+    public void getPresencas(final ServerCallback cb){
+        final PresencaController FC = new PresencaController();
         requestQueue = Volley.newRequestQueue(context);
         String query;
         query = "q=SELECT dataRegistro__c FROM Frequencia__c WHERE nomeCliente__c='"+ClienteDAO.clienteAtual.getNome()+"'";
 
         request = new StringRequest(com.android.volley.Request.Method.GET, Conexao.instanceURL + epQuery + query, new Response.Listener<String>() {
 
-            @Override
             public void onResponse(String response) {
                 try {
                     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -201,23 +204,27 @@ public class ClienteDAO {
                                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                                 String string = records.getJSONObject(i).getString("dataRegistro__c");
                                 Date data = formatter.parse(string);
-                                Frequencia frequencia = new Frequencia(data);
-                                ClienteDAO.clienteAtual.getFrequencia().add(frequencia);
+                                Presenca p = new Presenca(data);
+                                presencas.add(p);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
                     }
+                    cb.onSuccess(presencas);
+
                     Log.d("ANONY FREQ", ClienteDAO.clienteAtual.getFrequencia().size()+"");
+
+                    ClienteDAO.clienteAtual.setFrequencia(ClienteDAO.clienteAtual.getFrequencia());
 
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d("Error", e.getMessage());
                 }
 
+
                 Log.d("Success query", response);
             }
-
 
         }, new Response.ErrorListener() {
             @Override
@@ -233,9 +240,7 @@ public class ClienteDAO {
                 return header;
             }
         };
-        result = true;
         requestQueue.add(request);
-        return result;
     }
 
     //Métodos para a Tela de Loja

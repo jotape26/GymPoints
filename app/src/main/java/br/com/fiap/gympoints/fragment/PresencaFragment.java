@@ -37,12 +37,12 @@ public class PresencaFragment extends Fragment {
 
         listView = myView.findViewById(R.id.lista_presenca);
         presencas = new ArrayList<Presenca>();
-        presencas.add(new Presenca("11/09/2018", 25));
-        presencas.add(new Presenca("10/09/2018", 25));
-        presencas.add(new Presenca("09/09/2018", 25));
-        presencas.add(new Presenca("08/09/2018", 25));
-        presencas.add(new Presenca("07/09/2018", 25));
-        presencas.add(new Presenca("06/09/2018", 25));
+//        presencas.add(new Presenca("11/09/2018", 25));
+//        presencas.add(new Presenca("10/09/2018", 25));
+//        presencas.add(new Presenca("09/09/2018", 25));
+//        presencas.add(new Presenca("08/09/2018", 25));
+//        presencas.add(new Presenca("07/09/2018", 25));
+//        presencas.add(new Presenca("06/09/2018", 25));
 
         PresencaAdapter adapter = new PresencaAdapter(getContext(), presencas);
         listView.setAdapter(adapter);
