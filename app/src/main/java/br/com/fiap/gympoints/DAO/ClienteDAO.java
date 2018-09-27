@@ -35,7 +35,7 @@ import br.com.fiap.gympoints.Model.Presenca;
 
 public class ClienteDAO {
     public static Cliente clienteAtual = new Cliente();
-    private final List<Presenca> presencas = new ArrayList<Presenca>();
+    public static final List<Presenca> presencas = new ArrayList<Presenca>();
     private RequestQueue requestQueue;
     private StringRequest request;
     private JsonObjectRequest jsonRequest;
@@ -171,6 +171,8 @@ public class ClienteDAO {
         requestQueue.add(jsonRequest);
     }
 
+
+
     // Métodos para a Tela de Perfil: 1 e 2
     // Métodos para a Tela de Frequência: 2 com getAll = true
 
@@ -204,13 +206,14 @@ public class ClienteDAO {
                                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                                 String string = records.getJSONObject(i).getString("dataRegistro__c");
                                 Date data = formatter.parse(string);
-                                Presenca p = new Presenca(data);
-                                presencas.add(p);
+                                //Presenca p = new Presenca(data);
+                                //presencas.add(p);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
                     }
+
                     cb.onSuccess(presencas);
 
                     Log.d("ANONY FREQ", ClienteDAO.clienteAtual.getFrequencia().size()+"");

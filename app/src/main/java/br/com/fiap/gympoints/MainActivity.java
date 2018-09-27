@@ -3,6 +3,7 @@ package br.com.fiap.gympoints;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.design.widget.NavigationView;
@@ -22,13 +23,29 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import br.com.fiap.gympoints.Controller.PresencaController;
 import br.com.fiap.gympoints.Controller.ServerCallback;
 import br.com.fiap.gympoints.DAO.ClienteDAO;
-import br.com.fiap.gympoints.Model.Frequencia;
+import br.com.fiap.gympoints.DAO.Conexao;
 import br.com.fiap.gympoints.Model.Presenca;
 import br.com.fiap.gympoints.adapter.PresencaAdapter;
 import br.com.fiap.gympoints.fragment.LojaFragment;
@@ -39,21 +56,35 @@ import br.com.fiap.gympoints.fragment.SobreFragment;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private List<Presenca> presencas = new ArrayList<Presenca>();
+    private List<Presenca> presencas = new ArrayList<>();
     private TextView txt_usuario;
     private TextView txt_points;
     private ListView listView;
     private AlertDialog alerta;
     private AlertDialog alerta_token;
     private Button cadastrar;
+    ClienteDAO dao;
+    private RequestQueue requestQueue;
+    private String epQuery = "/services/data/v43.0/query/?";
+    private String epCliente = "/services/data/v43.0/sobjects/Cliente__c";
+    private StringRequest request;
+    private JsonObjectRequest jsonRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ClienteDAO dao = new ClienteDAO(getApplicationContext());
-        final PresencaController FC = new PresencaController();
-        dao.getPresencas(FC);
+        dao = new ClienteDAO(getApplicationContext());
+        getPresencas();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i("TAMANHOOO", ""+dao.presencas.size());
+            }
+        });
+        Log.i("TAMANHOOO", ""+dao.presencas.size());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        listView = findViewById(R.id.ultimas_presencas);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         TextView txt_usuario = (TextView) findViewById(R.id.txt_usuario);
         TextView txt_points = (TextView) findViewById(R.id.txt_points);
@@ -74,16 +105,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-
-        presencas = new PresencaController().getPresencas();
-//        presencas.add(new Presenca("11/09/2018", 25));
-//        presencas.add(new Presenca("10/09/2018", 25));
-//        presencas.add(new Presenca("09/09/2018", 25));
-
-        PresencaAdapter adapter = new PresencaAdapter(MainActivity.this, presencas);
-        listView = findViewById(R.id.ultimas_presencas);
-        listView.setAdapter(adapter);
 
         cadastrar = findViewById(R.id.btn_token);
         cadastrar.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +129,8 @@ public class MainActivity extends AppCompatActivity
                 alerta_token.show();
             }
         });
+
+
     }
 
     @Override
@@ -193,4 +216,84 @@ public class MainActivity extends AppCompatActivity
         TextView messageView = (TextView)alerta.findViewById(android.R.id.message);
         messageView.setGravity(Gravity.CENTER);
     }
+
+
+
+
+
+
+    public void getPresencas(){
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
+        String query;
+        query = "q=SELECT dataRegistro__c FROM Frequencia__c WHERE nomeCliente__c='"+ClienteDAO.clienteAtual.getNome()+"'";
+
+        request = new StringRequest(com.android.volley.Request.Method.GET, Conexao.instanceURL + epQuery + query, new Response.Listener<String>() {
+
+            public void onResponse(String response) {
+                try {
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
+
+                    JSONObject jsonResponse = new JSONObject(response);
+                    // Pega o vetor que contém os registros de Frequencia na query no SF
+                    JSONArray records = jsonResponse.getJSONArray("records");
+                    if (records.length() == 0) {
+                        throw new Exception("Comece a frequentar a academia para ganhar pontos!");
+                    }
+
+                    if(records.length() != ClienteDAO.clienteAtual.getFrequencia().size() ) {
+                        for (int i = 0; i < records.length(); i++) {
+                            try {
+                                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);
+                                String string = records.getJSONObject(i).getString("dataRegistro__c");
+                                Date data = formatter.parse(string);
+                                Log.i("DATA", data.toString());
+                                Presenca p = new Presenca(data);
+                                presencas.add(p);
+                                Log.i("VALL",presencas.size() + "");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if(!presencas.isEmpty()){
+                            PresencaAdapter adapter = new PresencaAdapter(MainActivity.this, presencas);
+                            listView.setAdapter(adapter);
+                        }else{
+                            Log.i("VALL",presencas.size() + "");
+                        }
+
+                    }
+
+                    Log.d("ANONY FREQ", ClienteDAO.clienteAtual.getFrequencia().size()+"");
+
+                    ClienteDAO.clienteAtual.setFrequencia(ClienteDAO.clienteAtual.getFrequencia());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.d("Error", e.getMessage());
+                }
+
+
+                Log.d("Success query", response);
+            }
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> header = new HashMap<String, String>();
+                header.put("Authorization", "Bearer " + Conexao.accessToken);
+                header.put("Content-Type", "application/json");
+                return header;
+            }
+        };
+        requestQueue.add(request);
+    }
+
+
 }
