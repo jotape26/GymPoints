@@ -10,8 +10,10 @@ public class Cliente {
     private String senha;
     private Integer idade;
     private Integer pontos;
+    private List<Frequencia> frequencia = new ArrayList<Frequencia>();
 
     public Cliente(){};
+
     public Cliente(String nome, String cpf, String email, String senha, Integer idade) {
         this.nome = nome;
         this.cpf = cpf;
@@ -79,5 +81,13 @@ public class Cliente {
 
     public void setPontos(Integer pontos) {
         this.pontos = pontos;
+    }
+
+    public List<Frequencia> getFrequencia() {
+        return frequencia;
+    }
+
+    public void setFrequencia(List<Frequencia> frequencia) {
+        this.frequencia = frequencia;
     }
 }
