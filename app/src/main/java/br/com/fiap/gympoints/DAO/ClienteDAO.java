@@ -14,6 +14,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import android.content.Context;
+import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +46,8 @@ public class ClienteDAO {
     // Endpoints da salesforce
     private String epQuery = "/services/data/v43.0/query/?";
     private String epCliente = "/services/data/v43.0/sobjects/Cliente__c";
+    private String epCarrinho = "/services/data/v43.0/sobjects/Carrinho__c";
+
 
     // Construtor para quando usarmos snackbar(dentro de um setOnClickListener)
     public ClienteDAO(Context context, View v){
@@ -171,85 +175,60 @@ public class ClienteDAO {
         requestQueue.add(jsonRequest);
     }
 
+    //Métodos para a Tela de Loja
 
-
-    // Métodos para a Tela de Perfil: 1 e 2
-    // Métodos para a Tela de Frequência: 2 com getAll = true
-
-    // 1. Pegar Usuário (Nome e Pontos)
-
-    // 2. Pegar Frequências do SF e seta na variável de Conexão do Cliente atual logado
-    // (Parâmetro Boolean getAll para retornar 5 ultimas presenças ou todas)
-    public void getPresencas(final ServerCallback cb){
-        final PresencaController FC = new PresencaController();
+    public void comprarProduto(final String produtoID, final String nome) {
         requestQueue = Volley.newRequestQueue(context);
-        String query;
-        query = "q=SELECT dataRegistro__c FROM Frequencia__c WHERE nomeCliente__c='"+ClienteDAO.clienteAtual.getNome()+"'";
+        JSONObject jsonObject = new JSONObject();
 
-        request = new StringRequest(com.android.volley.Request.Method.GET, Conexao.instanceURL + epQuery + query, new Response.Listener<String>() {
+        try{
+            jsonObject.put("Desconto__c", produtoID);
+            jsonObject.put("Cliente__c", Conexao.clientID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-            public void onResponse(String response) {
-                try {
-                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                    StrictMode.setThreadPolicy(policy);
-
-                    JSONObject jsonResponse = new JSONObject(response);
-                    // Pega o vetor que contém os registros de Frequencia na query no SF
-                    JSONArray records = jsonResponse.getJSONArray("records");
-                    if (records.length() == 0) {
-                        throw new Exception("Comece a frequentar a academia para ganhar pontos!");
-                    }
-
-                    if(records.length() != ClienteDAO.clienteAtual.getFrequencia().size() ) {
-                        for (int i = 0; i < records.length(); i++) {
-                            try {
-                                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                                String string = records.getJSONObject(i).getString("dataRegistro__c");
-                                Date data = formatter.parse(string);
-                                //Presenca p = new Presenca(data);
-                                //presencas.add(p);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-
-                    cb.onSuccess(presencas);
-
-                    Log.d("ANONY FREQ", ClienteDAO.clienteAtual.getFrequencia().size()+"");
-
-                    ClienteDAO.clienteAtual.setFrequencia(ClienteDAO.clienteAtual.getFrequencia());
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.d("Error", e.getMessage());
-                }
-
-
-                Log.d("Success query", response);
+        jsonRequest = new JsonObjectRequest(Request.Method.POST, Conexao.instanceURL+ epCarrinho, jsonObject, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Toast.makeText(context, nome,Toast.LENGTH_LONG).show();
+                Log.d("Response", response.toString());
             }
-
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
+                String statusCode = String.valueOf(error.networkResponse.statusCode);
+                Log.d("Status_Code", statusCode.toString());
+                //Pega o body e converte para String
+                NetworkResponse networkResponse = error.networkResponse;
+                if (networkResponse != null && networkResponse.data != null) {
+
+                    String errorSF = null;
+                    try {
+                        JSONObject json = new JSONArray(new String(networkResponse.data)).getJSONObject(0);
+                        errorSF = json.getString("message");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    Toast.makeText(context, errorSF,Toast.LENGTH_LONG).show();
+                }
             }
+
         }) {
+
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> header = new HashMap<String, String>();
-                header.put("Authorization", "Bearer " + Conexao.accessToken);
+                //Configuração solicitada pela SF para ter acesso ao SF
+                header.put("Authorization", "Bearer "+ Conexao.accessToken);
+                //Define o tipo de conteúdo que está sendo enviado
                 header.put("Content-Type", "application/json");
                 return header;
             }
+
         };
-        requestQueue.add(request);
+
+        requestQueue.add(jsonRequest);
     }
-
-    //Métodos para a Tela de Loja
-
-    // 3. ComprarDesconto
-    // Subtrair o total de pontos
-    // Vincular Cliente com Desconto no SF
-
 }

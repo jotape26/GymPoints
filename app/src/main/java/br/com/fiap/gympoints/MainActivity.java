@@ -74,13 +74,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         dao = new ClienteDAO(getApplicationContext());
         getPresencas();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.i("TAMANHOOO", ""+dao.presencas.size());
-            }
-        });
-        Log.i("TAMANHOOO", ""+dao.presencas.size());
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
