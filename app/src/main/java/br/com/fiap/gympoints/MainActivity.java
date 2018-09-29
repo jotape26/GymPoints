@@ -247,10 +247,8 @@ public class MainActivity extends AppCompatActivity
                                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);
                                 String string = records.getJSONObject(i).getString("dataRegistro__c");
                                 Date data = formatter.parse(string);
-                                Log.i("DATA", data.toString());
                                 Presenca p = new Presenca(data);
                                 presencas.add(p);
-                                Log.i("VALL",presencas.size() + "");
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -260,12 +258,10 @@ public class MainActivity extends AppCompatActivity
                             PresencaAdapter adapter = new PresencaAdapter(MainActivity.this, presencas);
                             listView.setAdapter(adapter);
                         }else{
-                            Log.i("VALL",presencas.size() + "");
+                            Log.i("isEmpty",presencas.size() + "");
                         }
 
                     }
-
-                    Log.d("ANONY FREQ", ClienteDAO.clienteAtual.getFrequencia().size()+"");
 
                     ClienteDAO.clienteAtual.setFrequencia(ClienteDAO.clienteAtual.getFrequencia());
 

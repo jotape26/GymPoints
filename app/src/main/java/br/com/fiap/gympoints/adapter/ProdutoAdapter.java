@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
+import java.util.List;
 import java.util.ArrayList;
 
 import br.com.fiap.gympoints.R;
@@ -16,9 +16,9 @@ import br.com.fiap.gympoints.Model.Produto;
 public class ProdutoAdapter extends BaseAdapter {
 
     private Context context;
-    private ArrayList<Produto> produtos;
+    private List<Produto> produtos;
 
-    public ProdutoAdapter(Context context, ArrayList<Produto> produtos) {
+    public ProdutoAdapter(Context context, List<Produto> produtos) {
         this.context = context;
         this.produtos = produtos;
     }
