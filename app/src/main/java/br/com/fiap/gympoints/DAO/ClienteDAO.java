@@ -34,6 +34,7 @@ import br.com.fiap.gympoints.MainActivity;
 import br.com.fiap.gympoints.Model.Cliente;
 import br.com.fiap.gympoints.Model.Frequencia;
 import br.com.fiap.gympoints.Model.Presenca;
+import br.com.fiap.gympoints.Model.Produto;
 
 public class ClienteDAO {
     public static Cliente clienteAtual = new Cliente();
@@ -123,7 +124,6 @@ public class ClienteDAO {
     public void registrar(final Cliente cliente) {
         requestQueue = Volley.newRequestQueue(context);
         JSONObject jsonObject = new JSONObject();
-
         try{
             jsonObject.put("nome__c", cliente.getNome());
             jsonObject.put("cpf__c", cliente.getCpf());
@@ -179,58 +179,60 @@ public class ClienteDAO {
 
     //Métodos para a Tela de Loja
 
-    public void comprarProduto(final String produtoID, final String nome) {
+    public void comprarProduto(final Produto produto) {
         requestQueue = Volley.newRequestQueue(context);
         JSONObject jsonObject = new JSONObject();
-
         try{
-            jsonObject.put("Desconto__c", produtoID);
+            if(clienteAtual.getPontos() - produto.getPreco() < 0){
+                throw new Exception("Você não possui pontos suficientes");
+            }
+            jsonObject.put("Desconto__c", produto.getIdSF());
             jsonObject.put("Cliente__c", Conexao.clientID);
+
+            jsonRequest = new JsonObjectRequest(Request.Method.POST, Conexao.instanceURL+ epCarrinho, jsonObject, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    clienteAtual.setPontos(clienteAtual.getPontos() - produto.getPreco());
+                    Toast.makeText(context, produto.getNome() + " comprado", Toast.LENGTH_LONG).show();
+                    Log.d("Response", response.toString());
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    String statusCode = String.valueOf(error.networkResponse.statusCode);
+                    Log.d("Status_Code", statusCode.toString());
+                    //Pega o body e converte para String
+                    NetworkResponse networkResponse = error.networkResponse;
+                    if (networkResponse != null && networkResponse.data != null) {
+                        String errorSF = null;
+                        try {
+                            JSONObject json = new JSONArray(new String(networkResponse.data)).getJSONObject(0);
+                            errorSF = json.getString("message");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Toast.makeText(context, errorSF,Toast.LENGTH_LONG).show();
+                    }
+                }
+            }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<String, String>();
+                    //Configuração solicitada pela SF para ter acesso ao SF
+                    header.put("Authorization", "Bearer "+ Conexao.accessToken);
+                    //Define o tipo de conteúdo que está sendo enviado
+                    header.put("Content-Type", "application/json");
+                    return header;
+                }
+
+            };
+
+            requestQueue.add(jsonRequest);
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (Exception e){
+            Snackbar.make(v, e.getMessage(), Snackbar.LENGTH_SHORT).show();
         }
-
-        jsonRequest = new JsonObjectRequest(Request.Method.POST, Conexao.instanceURL+ epCarrinho, jsonObject, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Toast.makeText(context, nome,Toast.LENGTH_LONG).show();
-                Log.d("Response", response.toString());
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                String statusCode = String.valueOf(error.networkResponse.statusCode);
-                Log.d("Status_Code", statusCode.toString());
-                //Pega o body e converte para String
-                NetworkResponse networkResponse = error.networkResponse;
-                if (networkResponse != null && networkResponse.data != null) {
-
-                    String errorSF = null;
-                    try {
-                        JSONObject json = new JSONArray(new String(networkResponse.data)).getJSONObject(0);
-                        errorSF = json.getString("message");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    Toast.makeText(context, errorSF,Toast.LENGTH_LONG).show();
-                }
-            }
-
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> header = new HashMap<String, String>();
-                //Configuração solicitada pela SF para ter acesso ao SF
-                header.put("Authorization", "Bearer "+ Conexao.accessToken);
-                //Define o tipo de conteúdo que está sendo enviado
-                header.put("Content-Type", "application/json");
-                return header;
-            }
-
-        };
-
-        requestQueue.add(jsonRequest);
     }
 }

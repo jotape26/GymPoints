@@ -74,7 +74,7 @@ public class LojaFragment extends Fragment {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+            public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 LayoutInflater inflater2 = getLayoutInflater();
                 builder.setCustomTitle(inflater2.inflate(R.layout.compra, null));
@@ -87,8 +87,8 @@ public class LojaFragment extends Fragment {
                 builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ClienteDAO dao = new ClienteDAO(getContext());
-                        dao.comprarProduto(produto.getIdSF(), produto.getNome());
+                        ClienteDAO dao = new ClienteDAO(getContext(), view);
+                        dao.comprarProduto(produto);
                     }
                 });
                 builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {

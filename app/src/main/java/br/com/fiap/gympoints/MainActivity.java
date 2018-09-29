@@ -166,6 +166,11 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_perfil) {
             getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            // Reload para os pontos
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
+            overridePendingTransition(0, 0);
         } else if (id == R.id.nav_presenca) {
             getSupportFragmentManager().beginTransaction().replace(R.id.inicial, new PresencaFragment(),"presenca")
                     .addToBackStack(null).commit();
@@ -248,7 +253,14 @@ public class MainActivity extends AppCompatActivity
                         }
 
                         if(!presencas.isEmpty()){
-                            PresencaAdapter adapter = new PresencaAdapter(MainActivity.this, presencas);
+                            List<Presenca> ultimasPresencas = new ArrayList<>();
+                            for(int i = 0; i < 5; i++){
+                                if(presencas.get(i) == null){
+                                    break;
+                                }
+                                ultimasPresencas.add(presencas.get(i));
+                            }
+                            PresencaAdapter adapter = new PresencaAdapter(MainActivity.this, ultimasPresencas);
                             listView.setAdapter(adapter);
                         }else{
                             Log.i("isEmpty",presencas.size() + "");
