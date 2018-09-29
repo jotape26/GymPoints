@@ -148,13 +148,15 @@ public class ClienteDAO {
             @Override
             public void onErrorResponse(VolleyError error) {
                 String body = null;
-                String statusCode = String.valueOf(error.networkResponse.statusCode);
-                Log.d("Status_Code", statusCode.toString());
-                //Pega o body e converte para String
-                NetworkResponse networkResponse = error.networkResponse;
-                if (networkResponse != null && networkResponse.data != null) {
-                    String jsonError = new String(networkResponse.data);
-                    Log.d("json_error", jsonError);
+                String errorSF = null;
+                try {
+                    JSONObject json = new JSONArray(new String(error.networkResponse.data)).getJSONObject(0);
+                    errorSF = json.getString("errorCode");
+                    if( errorSF.equals("DUPLICATE_VALUE")){
+                        Snackbar.make(v, "Email já registrado",Snackbar.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
 
