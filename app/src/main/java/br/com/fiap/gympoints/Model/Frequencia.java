@@ -1,8 +1,9 @@
 package br.com.fiap.gympoints.Model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Frequencia {
+public class Frequencia implements Serializable {
     private Date data;
 
     public Frequencia(Date data) {

@@ -13,9 +13,9 @@
             android:icon="@drawable/ic_presenca"
             android:title="Presenca" />
         <item
-            android:id="@+id/nav_ranking"
-            android:icon="@drawable/ic_ranking"
-            android:title="Ranking" />
+            android:id="@+id/nav_academia"
+            android:icon="@drawable/ic_academia"
+            android:title="Academia" />
         <item
             android:id="@+id/nav_loja"
             android:icon="@drawable/ic_loja"

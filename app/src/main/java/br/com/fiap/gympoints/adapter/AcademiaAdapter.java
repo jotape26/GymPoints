@@ -10,28 +10,29 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import br.com.fiap.gympoints.Model.Academia;
 import br.com.fiap.gympoints.R;
 import br.com.fiap.gympoints.Model.Produto;
 import br.com.fiap.gympoints.Model.Usuario;
 
-public class UsuarioAdapter extends BaseAdapter {
+public class AcademiaAdapter extends BaseAdapter {
 
     private Context context;
-    private ArrayList<Usuario> usuarios;
+    private ArrayList<Academia> academias;
 
-    public UsuarioAdapter(Context context, ArrayList<Usuario> usuarios) {
+    public AcademiaAdapter(Context context, ArrayList<Academia> academias) {
         this.context = context;
-        this.usuarios = usuarios;
+        this.academias = academias;
     }
 
     @Override
     public int getCount() {
-        return usuarios.size();
+        return academias.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return usuarios.get(position);
+        return academias.get(position);
     }
 
     @Override
@@ -41,11 +42,10 @@ public class UsuarioAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Usuario usuario = usuarios.get(position);
+        Academia academia = academias.get(position);
         LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-        convertView = inflater.inflate(R.layout.posicao, parent, false);
-        ((TextView)convertView.findViewById(R.id.rnk_nome)).setText(usuario.getNome());
-        ((TextView)convertView.findViewById(R.id.rnk_pontos)).setText(usuario.getPontos().toString());
+        convertView = inflater.inflate(R.layout.academia, parent, false);
+        ((TextView)convertView.findViewById(R.id.ac_nome)).setText(academia.getNome());
         return convertView;
     }
 }

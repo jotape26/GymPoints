@@ -3,7 +3,6 @@ package br.com.fiap.gympoints;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.design.widget.NavigationView;
@@ -13,7 +12,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -24,17 +22,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import br.com.fiap.gympoints.DAO.ClienteDAO;
-import br.com.fiap.gympoints.DAO.Conexao;
-import br.com.fiap.gympoints.Model.Cliente;
-import br.com.fiap.gympoints.Model.Frequencia;
 import br.com.fiap.gympoints.Model.Presenca;
 import br.com.fiap.gympoints.adapter.PresencaAdapter;
 import br.com.fiap.gympoints.fragment.LojaFragment;
 import br.com.fiap.gympoints.fragment.PresencaFragment;
-import br.com.fiap.gympoints.fragment.RankingFragment;
+import br.com.fiap.gympoints.fragment.AcademiaFragment;
 import br.com.fiap.gympoints.fragment.SobreFragment;
 
 public class MainActivity extends AppCompatActivity
@@ -153,8 +147,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_presenca) {
             getSupportFragmentManager().beginTransaction().replace(R.id.inicial, new PresencaFragment(),"presenca")
                     .addToBackStack(null).commit();
-        } else if (id == R.id.nav_ranking) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.inicial, new RankingFragment(),"ranking")
+        } else if (id == R.id.nav_academia) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.inicial, new AcademiaFragment(),"academia")
                     .addToBackStack(null).commit();
         } else if (id == R.id.nav_loja) {
             getSupportFragmentManager().beginTransaction().replace(R.id.inicial, new LojaFragment(),"loja")
