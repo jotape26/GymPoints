@@ -134,7 +134,7 @@ public class LojaFragment extends Fragment {
                             Integer preco = records.getJSONObject(i).getInt("valor__c");
                             String descricao = records.getJSONObject(i).getString("descricao__c");
                             String idSF = records.getJSONObject(i).getString("Id");                            
-                            String desconto = "\nDesconto de " + records.getJSONObject(i).getInt("porcentagem__c") + "%";
+                            String desconto = "Desconto de " + records.getJSONObject(i).getInt("porcentagem__c") + "%";
                             if (descricao == null) {
                                 descricao += desconto;
                             } else {

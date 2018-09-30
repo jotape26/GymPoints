@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity
     private AlertDialog alerta;
     private AlertDialog alerta_token;
     private Button cadastrar;
-    ClienteDAO dao;
+    private ClienteDAO dao;
     private RequestQueue requestQueue;
     private String epQuery = "/services/data/v43.0/query/?";
     private String epCliente = "/services/data/v43.0/sobjects/Cliente__c";
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity
         listView = findViewById(R.id.ultimas_presencas);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         TextView txt_usuario = (TextView) findViewById(R.id.txt_usuario);
-        TextView txt_points = (TextView) findViewById(R.id.txt_points);
+        final TextView txt_points = (TextView) findViewById(R.id.txt_points);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
@@ -98,18 +99,27 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
         cadastrar = findViewById(R.id.btn_token);
         cadastrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 LayoutInflater inflater = getLayoutInflater();
+                final View dialogView = inflater.inflate(R.layout.token, null);
                 builder.setView(inflater.inflate(R.layout.token, null));
+                final EditText txt_token = (EditText) dialogView.findViewById(R.id.txt_token);
+
                 builder.setPositiveButton("Aceitar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this,"Token adicionado com sucesso!",Toast.LENGTH_LONG).show();
+                        String token = txt_token.getText().toString();
+                        Log.d("Token", token);
+                        if( token != "" && token.equals("validTkn")){
+                                dao.adicionarFrequencia(txt_points);
+                                Toast.makeText(MainActivity.this,"Token adicionado com sucesso!",Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(MainActivity.this,"Insira um Token Válido!",Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
                 builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {

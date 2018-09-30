@@ -14,6 +14,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import android.content.Context;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -48,6 +49,7 @@ public class ClienteDAO {
     private String epQuery = "/services/data/v43.0/query/?";
     private String epCliente = "/services/data/v43.0/sobjects/Cliente__c";
     private String epCarrinho = "/services/data/v43.0/sobjects/Carrinho__c";
+    private String epFrequencia = "/services/data/v43.0/sobjects/Frequencia__c";
 
 
     // Construtor para quando usarmos snackbar(dentro de um setOnClickListener)
@@ -177,8 +179,6 @@ public class ClienteDAO {
         requestQueue.add(jsonRequest);
     }
 
-    //Métodos para a Tela de Loja
-
     public void comprarProduto(final Produto produto) {
         requestQueue = Volley.newRequestQueue(context);
         JSONObject jsonObject = new JSONObject();
@@ -235,4 +235,53 @@ public class ClienteDAO {
             Snackbar.make(v, e.getMessage(), Snackbar.LENGTH_SHORT).show();
         }
     }
+
+    public void adicionarFrequencia(final TextView txt_points) {
+        requestQueue = Volley.newRequestQueue(context);
+        JSONObject jsonObject = new JSONObject();
+        try{
+            jsonObject.put("Cliente__c", Conexao.clientID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        jsonRequest = new JsonObjectRequest(Request.Method.POST, Conexao.instanceURL+epFrequencia, jsonObject, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                clienteAtual.setPontos(clienteAtual.getPontos()+25);
+                txt_points.setText("Você possui "+ ClienteDAO.clienteAtual.getPontos().toString() + " G-Points!");
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+                Log.d("Response", response.toString());
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                String body = null;
+                String errorSF = null;
+                try {
+                    JSONObject json = new JSONArray(new String(error.networkResponse.data)).getJSONObject(0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> header = new HashMap<String, String>();
+                //Configuração solicitada pela SF para ter acesso ao SF
+                header.put("Authorization", "Bearer "+ Conexao.accessToken);
+                //Define o tipo de conteúdo que está sendo enviado
+                header.put("Content-Type", "application/json");
+                return header;
+            }
+
+        };
+
+        requestQueue.add(jsonRequest);
+    }
+
+
 }
