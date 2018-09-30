@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 LayoutInflater inflater = getLayoutInflater();
                 final View dialogView = inflater.inflate(R.layout.token, null);
-                builder.setView(inflater.inflate(R.layout.token, null));
+                builder.setView(dialogView);
                 final EditText txt_token = (EditText) dialogView.findViewById(R.id.txt_token);
 
                 builder.setPositiveButton("Aceitar", new DialogInterface.OnClickListener() {
@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity
                             Toast.makeText(MainActivity.this,"Insira um Token Válido!",Toast.LENGTH_SHORT).show();
                         }
                     }
+
                 });
                 builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     @Override
