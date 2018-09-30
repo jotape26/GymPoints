@@ -65,7 +65,7 @@ public class ClienteDAO {
 
     public void login(final Cliente cliente){
         requestQueue = Volley.newRequestQueue(context);
-        String query = "q=SELECT senha__c, nome__c, cpf__c, email__c, idade__c, pontos__c FROM Cliente__c WHERE email__c ='" + cliente.getEmail() + "'";
+        String query = "q=SELECT senha__c, nome__c, cpf__c, email__c, idade__c, pontos__c, nomeAcademia__c FROM Cliente__c WHERE email__c ='" + cliente.getEmail() + "'";
         request = new StringRequest(com.android.volley.Request.Method.GET, Conexao.instanceURL + epQuery + query, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -87,9 +87,10 @@ public class ClienteDAO {
                     String nomeSF  = data.getString("nome__c");
                     String cpfSF = data.getString("cpf__c");
                     String emailSF  = data.getString("email__c");
+                    String academiaSF  = data.getString("nomeAcademia__c");
                     Integer idadeSF = data.getInt("idade__c");
                     Integer pontosSF = data.getInt("pontos__c");
-                    ClienteDAO.clienteAtual = new Cliente(nomeSF,  cpfSF,  emailSF,  idadeSF, pontosSF);
+                    ClienteDAO.clienteAtual = new Cliente(nomeSF,  cpfSF,  emailSF,  idadeSF, pontosSF, academiaSF);
                     // Extraindo attributes porque no atributo url tem o clientID usado para manipular o registro da conta logada
                     JSONObject atributes = data.getJSONObject("attributes");
                     Conexao.clientID = atributes.getString("url").substring(41);

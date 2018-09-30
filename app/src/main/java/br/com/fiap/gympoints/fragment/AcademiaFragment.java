@@ -16,6 +16,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import br.com.fiap.gympoints.DAO.ClienteDAO;
+import br.com.fiap.gympoints.DAO.Conexao;
+import br.com.fiap.gympoints.MainActivity;
 import br.com.fiap.gympoints.Model.Academia;
 import br.com.fiap.gympoints.R;
 import br.com.fiap.gympoints.adapter.AcademiaAdapter;
@@ -42,6 +45,8 @@ public class AcademiaFragment extends Fragment {
         myView = inflater.inflate(R.layout.fragment_academia, container, false);
         listView = myView.findViewById(R.id.lista_academias);
         atual = myView.findViewById(R.id.atual);
+        ClienteDAO dao = new ClienteDAO(getContext(), getView());
+        atual.setText("Academia "+dao.clienteAtual.getAcademia());
 
         academias = new ArrayList<Academia>();
         academias.add(new Academia("1", "Academia X", "academiax@email.com", "Rua X"));
