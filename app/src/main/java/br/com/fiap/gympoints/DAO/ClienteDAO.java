@@ -1,6 +1,5 @@
 package br.com.fiap.gympoints.DAO;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.StrictMode;
 import android.support.design.widget.Snackbar;
@@ -15,6 +14,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import android.content.Context;
+import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,12 +28,17 @@ import java.util.List;
 import java.util.Map;
 import com.android.volley.toolbox.Volley;
 
+import br.com.fiap.gympoints.Controller.PresencaController;
+import br.com.fiap.gympoints.Controller.ServerCallback;
+import br.com.fiap.gympoints.MainActivity;
 import br.com.fiap.gympoints.Model.Cliente;
 import br.com.fiap.gympoints.Model.Frequencia;
+import br.com.fiap.gympoints.Model.Presenca;
+import br.com.fiap.gympoints.Model.Produto;
 
 public class ClienteDAO {
     public static Cliente clienteAtual = new Cliente();
-    public static final List<Frequencia> frequencias = new ArrayList<>();
+    public static final List<Presenca> presencas = new ArrayList<Presenca>();
     private RequestQueue requestQueue;
     private StringRequest request;
     private JsonObjectRequest jsonRequest;
@@ -41,6 +47,8 @@ public class ClienteDAO {
     // Endpoints da salesforce
     private String epQuery = "/services/data/v43.0/query/?";
     private String epCliente = "/services/data/v43.0/sobjects/Cliente__c";
+    private String epCarrinho = "/services/data/v43.0/sobjects/Carrinho__c";
+
 
     // Construtor para quando usarmos snackbar(dentro de um setOnClickListener)
     public ClienteDAO(Context context, View v){
@@ -116,7 +124,6 @@ public class ClienteDAO {
     public void registrar(final Cliente cliente) {
         requestQueue = Volley.newRequestQueue(context);
         JSONObject jsonObject = new JSONObject();
-
         try{
             jsonObject.put("nome__c", cliente.getNome());
             jsonObject.put("cpf__c", cliente.getCpf());
@@ -141,13 +148,15 @@ public class ClienteDAO {
             @Override
             public void onErrorResponse(VolleyError error) {
                 String body = null;
-                String statusCode = String.valueOf(error.networkResponse.statusCode);
-                Log.d("Status_Code", statusCode.toString());
-                //Pega o body e converte para String
-                NetworkResponse networkResponse = error.networkResponse;
-                if (networkResponse != null && networkResponse.data != null) {
-                    String jsonError = new String(networkResponse.data);
-                    Log.d("json_error", jsonError);
+                String errorSF = null;
+                try {
+                    JSONObject json = new JSONArray(new String(error.networkResponse.data)).getJSONObject(0);
+                    errorSF = json.getString("errorCode");
+                    if( errorSF.equals("DUPLICATE_VALUE")){
+                        Snackbar.make(v, "Email já registrado",Snackbar.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -168,78 +177,62 @@ public class ClienteDAO {
         requestQueue.add(jsonRequest);
     }
 
-    // Métodos para a Tela de Perfil: 1 e 2
-    // Métodos para a Tela de Frequência: 2 com getAll = true
-
-    // 1. Pegar Usuário (Nome e Pontos)
-
-    // 2. Pegar Frequências do SF e seta na variável de Conexão do Cliente atual logado
-    // (Parâmetro Boolean getAll para retornar 5 ultimas presenças ou todas)
-    public void getFrequencias(){
-        requestQueue = Volley.newRequestQueue(context);
-        String query;
-        query = "q=SELECT dataRegistro__c FROM Frequencia__c WHERE nomeCliente__c='"+ClienteDAO.clienteAtual.getNome()+"'";
-
-        request = new StringRequest(com.android.volley.Request.Method.GET, Conexao.instanceURL + epQuery + query, new Response.Listener<String>() {
-
-            @Override
-            public void onResponse(String response) {
-                try {
-                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                    StrictMode.setThreadPolicy(policy);
-
-                    JSONObject jsonResponse = new JSONObject(response);
-                    // Pega o vetor que contém os registros de Frequencia na query no SF
-                    JSONArray records = jsonResponse.getJSONArray("records");
-                    if (records.length() == 0) {
-                        throw new Exception("Comece a frequentar a academia para ganhar pontos!");
-                    }
-
-                    if(records.length() != ClienteDAO.frequencias.size() ) {
-                        for (int i = 0; i < records.length(); i++) {
-                            try {
-                                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                                String string = records.getJSONObject(i).getString("dataRegistro__c");
-                                Date data = formatter.parse(string);
-                                Frequencia frequencia = new Frequencia(data);
-                                ClienteDAO.frequencias.add(frequencia);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-
-                    Log.d("ANONY FREQ", ClienteDAO.frequencias.size()+"");
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.d("Error", e.getMessage());
-                }
-                Log.d("Success query", response);
-            }
-
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> header = new HashMap<String, String>();
-                header.put("Authorization", "Bearer " + Conexao.accessToken);
-                header.put("Content-Type", "application/json");
-                return header;
-            }
-        };
-        requestQueue.add(request);
-    }
-
     //Métodos para a Tela de Loja
 
-    // 3. ComprarDesconto
-    // Subtrair o total de pontos
-    // Vincular Cliente com Desconto no SF
+    public void comprarProduto(final Produto produto) {
+        requestQueue = Volley.newRequestQueue(context);
+        JSONObject jsonObject = new JSONObject();
+        try{
+            if(clienteAtual.getPontos() - produto.getPreco() < 0){
+                throw new Exception("Você não possui pontos suficientes");
+            }
+            jsonObject.put("Desconto__c", produto.getIdSF());
+            jsonObject.put("Cliente__c", Conexao.clientID);
 
+            jsonRequest = new JsonObjectRequest(Request.Method.POST, Conexao.instanceURL+ epCarrinho, jsonObject, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    clienteAtual.setPontos(clienteAtual.getPontos() - produto.getPreco());
+                    Toast.makeText(context, produto.getNome() + " comprado", Toast.LENGTH_LONG).show();
+                    Log.d("Response", response.toString());
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    String statusCode = String.valueOf(error.networkResponse.statusCode);
+                    Log.d("Status_Code", statusCode.toString());
+                    //Pega o body e converte para String
+                    NetworkResponse networkResponse = error.networkResponse;
+                    if (networkResponse != null && networkResponse.data != null) {
+                        String errorSF = null;
+                        try {
+                            JSONObject json = new JSONArray(new String(networkResponse.data)).getJSONObject(0);
+                            errorSF = json.getString("message");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Toast.makeText(context, errorSF,Toast.LENGTH_LONG).show();
+                    }
+                }
+            }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<String, String>();
+                    //Configuração solicitada pela SF para ter acesso ao SF
+                    header.put("Authorization", "Bearer "+ Conexao.accessToken);
+                    //Define o tipo de conteúdo que está sendo enviado
+                    header.put("Content-Type", "application/json");
+                    return header;
+                }
+
+            };
+
+            requestQueue.add(jsonRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e){
+            Snackbar.make(v, e.getMessage(), Snackbar.LENGTH_SHORT).show();
+        }
+    }
 }

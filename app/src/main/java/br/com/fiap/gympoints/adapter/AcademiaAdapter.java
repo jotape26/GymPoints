@@ -46,6 +46,8 @@ public class AcademiaAdapter extends BaseAdapter {
         LayoutInflater inflater = ((Activity)context).getLayoutInflater();
         convertView = inflater.inflate(R.layout.academia, parent, false);
         ((TextView)convertView.findViewById(R.id.ac_nome)).setText(academia.getNome());
+        ((TextView)convertView.findViewById(R.id.ac_endereco)).setText(academia.getEndereco());
+        ((TextView)convertView.findViewById(R.id.ac_email)).setText(academia.getEmail());
         return convertView;
     }
 }
