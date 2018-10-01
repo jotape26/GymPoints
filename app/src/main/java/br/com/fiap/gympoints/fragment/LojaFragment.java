@@ -121,7 +121,6 @@ public class LojaFragment extends Fragment {
         query = "SELECT Id, nome__c, valor__c, descricao__c, porcentagem__c FROM Desconto__c";
 
         request = new StringRequest(com.android.volley.Request.Method.GET, Conexao.instanceURL + epQuery + query, new Response.Listener<String>() {
-
             public void onResponse(String response) {
                 try {
                     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -152,7 +151,7 @@ public class LojaFragment extends Fragment {
                         ProdutoAdapter adapter = new ProdutoAdapter(getContext(), produtos);
                         listView.setAdapter(adapter);
                     }else{
-                        Log.d("Size else",produtos.size() + "");
+                        Toast.makeText(getContext(),"Não foi possivel recuperar a lista de produtos. Tente novamente mais tarde",Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

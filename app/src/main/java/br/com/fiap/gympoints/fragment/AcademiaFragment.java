@@ -4,8 +4,11 @@ package br.com.fiap.gympoints.fragment;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,15 +16,33 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import br.com.fiap.gympoints.DAO.ClienteDAO;
 import br.com.fiap.gympoints.DAO.Conexao;
 import br.com.fiap.gympoints.MainActivity;
 import br.com.fiap.gympoints.Model.Academia;
+import br.com.fiap.gympoints.Model.Presenca;
 import br.com.fiap.gympoints.R;
 import br.com.fiap.gympoints.adapter.AcademiaAdapter;
+import br.com.fiap.gympoints.adapter.PresencaAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +54,11 @@ public class AcademiaFragment extends Fragment {
     private View myView;
     private TextView atual;
     private AlertDialog alerta;
+    private com.android.volley.RequestQueue requestQueue;
+    private String epQuery = "/services/data/v43.0/query/?q=";
+    private String epAcademia = "/services/data/v43.0/sobjects/Academia__c";
+    private String queryAcad = "q=SELECT Name, Id, nome__c, email__c, endereço__c FROM Academia__c ";
+    private StringRequest request;
 
     public AcademiaFragment() {
         // Required empty public constructor
@@ -46,15 +72,16 @@ public class AcademiaFragment extends Fragment {
         listView = myView.findViewById(R.id.lista_academias);
         atual = myView.findViewById(R.id.atual);
         ClienteDAO dao = new ClienteDAO(getContext(), getView());
-        atual.setText("Academia "+dao.clienteAtual.getAcademia());
-
+        String sourceString = "<b>Você ainda não se <br/>filiou a uma academia</b>";
+        if(dao.clienteAtual.getAcademia() == "Not Found"){
+           sourceString = "<b>Academia:</b> " +dao.clienteAtual.getAcademia();
+        }
+        atual.setText(Html.fromHtml(sourceString));
         academias = new ArrayList<Academia>();
-        academias.add(new Academia("1", "Academia X", "academiax@email.com", "Rua X"));
-        academias.add(new Academia("2", "Academia Y", "academiay@email.com", "Rua Y"));
-        academias.add(new Academia("3", "Academia Z", "academiaz@email.com", "Rua Z"));
 
-        AcademiaAdapter adapter = new AcademiaAdapter(getContext(), academias);
-        listView.setAdapter(adapter);
+        getAcademias();
+
+
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -67,7 +94,8 @@ public class AcademiaFragment extends Fragment {
                 builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        atual.setText(academias.get(position).getNome());
+                        String sourceString = "<b>Academia:</b> " + academias.get(position).getNome();
+                        atual.setText(Html.fromHtml(sourceString));
                         Snackbar.make(myView, "Academia alterada com sucesso!", Snackbar.LENGTH_SHORT).show();
                     }
                 });
@@ -85,6 +113,60 @@ public class AcademiaFragment extends Fragment {
         });
 
         return myView;
+    }
+
+    private void getAcademias() {
+        requestQueue = com.android.volley.toolbox.Volley.newRequestQueue(getContext());
+        String query;
+        query = "SELECT Id,nome__c,email__c,endereco__c FROM Academia__c";
+
+        request = new StringRequest(com.android.volley.Request.Method.GET, Conexao.instanceURL + epQuery + query, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try{
+
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
+                    JSONObject jsonResponse = new JSONObject(response);
+                    JSONArray records = jsonResponse.getJSONArray("records");
+
+                    for(int i = 0; i < records.length(); i++){
+                        String sfID = records.getJSONObject(i).getString("Id");
+                        String nome = records.getJSONObject(i).getString("nome__c");
+                        String email = records.getJSONObject(i).getString("Email__c");
+                        String endereco = records.getJSONObject(i).getString("endereco__c");
+
+                        academias.add(new Academia(sfID,nome,email,endereco));
+                    }
+
+                    Log.d("lIST", academias.toString());
+                    if(!academias.isEmpty()){
+                        AcademiaAdapter adapter = new AcademiaAdapter(getContext(), academias);
+                        listView.setAdapter(adapter);
+                    }else{
+                        Toast.makeText(getContext(),"Não foi possivel recuperar a lista de academias. Tente novamente mais tarde",Toast.LENGTH_LONG).show();
+                    }
+
+                }catch(Exception e){
+                   Log.e("ERROR", e.getLocalizedMessage());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> header = new HashMap<String, String>();
+                header.put("Authorization", "Bearer " + Conexao.accessToken);
+                header.put("Content-Type", "application/json");
+                return header;
+            }
+        };
+
+        requestQueue.add(request);
     }
 
 }
