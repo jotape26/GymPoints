@@ -9,6 +9,7 @@ import android.os.StrictMode;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -54,9 +55,11 @@ public class LojaFragment extends Fragment {
     private ListView listView;
     private View myView;
     private AlertDialog alerta;
+    private TextView txtPontos;
     private com.android.volley.RequestQueue requestQueue;
     private String epQuery = "/services/data/v43.0/query/?q=";
     private StringRequest request;
+    private ClienteDAO dao = new ClienteDAO(getContext(), getView());
 
 
     public LojaFragment() {
@@ -68,6 +71,11 @@ public class LojaFragment extends Fragment {
                              Bundle savedInstanceState) {
         myView = inflater.inflate(R.layout.fragment_loja, container, false);
         listView = myView.findViewById(R.id.lista_loja);
+        txtPontos = myView.findViewById(R.id.txt_pontos);
+
+        String sourceString = "<b>Pontos disponiveis:</b> " + dao.clienteAtual.getPontos() ;
+        txtPontos.setText(Html.fromHtml(sourceString));
+
         getProdutos();
         ProdutoAdapter adapter = new ProdutoAdapter(getContext(), produtos);
         listView.setAdapter(adapter);
