@@ -10,7 +10,7 @@ public class Cliente {
     private String senha;
     private Integer idade;
     private Integer pontos;
-    private String academia;
+    private String academia = "";
     private List<Frequencia> frequencia = new ArrayList<Frequencia>();
 
     public Cliente(){};

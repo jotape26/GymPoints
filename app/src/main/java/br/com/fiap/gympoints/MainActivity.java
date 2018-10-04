@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity
                         Log.d("Token", token);
                         if( token != "" && token.equals("validTkn")){
                                 dao.adicionarFrequencia(txt_points);
-                                Toast.makeText(MainActivity.this,"Token adicionado com sucesso!",Toast.LENGTH_SHORT).show();
+                                getPresencas();
                         }else{
                             Toast.makeText(MainActivity.this,"Insira um Token Válido!",Toast.LENGTH_SHORT).show();
                         }

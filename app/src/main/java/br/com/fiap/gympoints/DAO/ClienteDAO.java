@@ -161,6 +161,19 @@ public class ClienteDAO {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                //Pega o body e converte para String
+                NetworkResponse networkResponse = error.networkResponse;
+                if (networkResponse != null && networkResponse.data != null) {
+                    try {
+                        JSONObject json = new JSONArray(new String(networkResponse.data)).getJSONObject(0);
+                        errorSF = json.getString("message");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(context, errorSF,Toast.LENGTH_LONG).show();
+                    Log.d("error", errorSF);
+                }
             }
 
         }) {
@@ -249,11 +262,19 @@ public class ClienteDAO {
         jsonRequest = new JsonObjectRequest(Request.Method.POST, Conexao.instanceURL+epFrequencia, jsonObject, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                clienteAtual.setPontos(clienteAtual.getPontos()+25);
-                txt_points.setText("Você possui "+ ClienteDAO.clienteAtual.getPontos().toString() + " G-Points!");
+
+
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
-                Log.d("Response", response.toString());
+
+                if(!clienteAtual.getAcademia().equals("")){
+                    txt_points.setText("Você possui "+ ClienteDAO.clienteAtual.getPontos().toString() + " G-Points!");
+                    clienteAtual.setPontos(clienteAtual.getPontos()+25);
+                    Toast.makeText(context,"Token adicionado com sucesso!",Toast.LENGTH_SHORT).show();
+                    Log.d("Response", response.toString());
+                } else {
+                    Toast.makeText(context,"Vincule-se à uma academia para registrar presença!",Toast.LENGTH_SHORT).show();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -265,6 +286,20 @@ public class ClienteDAO {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                //Pega o body e converte para String
+                NetworkResponse networkResponse = error.networkResponse;
+                if (networkResponse != null && networkResponse.data != null) {
+                    try {
+                        JSONObject json = new JSONArray(new String(networkResponse.data)).getJSONObject(0);
+                        errorSF = json.getString("message");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    Log.d("error", errorSF);
+                }
+
+
             }
 
         }) {
