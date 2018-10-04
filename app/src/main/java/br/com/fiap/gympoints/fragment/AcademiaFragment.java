@@ -125,7 +125,6 @@ public class AcademiaFragment extends Fragment {
         JSONObject jsonObject = new JSONObject();
         try{
             jsonObject.put("Academia__c", academia.getIdSf());
-            jsonObject.
         } catch (JSONException e) {
             e.printStackTrace();
         }
