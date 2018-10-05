@@ -78,7 +78,7 @@ public class AcademiaFragment extends Fragment {
         ClienteDAO dao = new ClienteDAO(getContext(), getView());
 
         String sourceString = "<b>Academia:</b> " +dao.clienteAtual.getAcademia();
-        if(dao.clienteAtual.getAcademia() == "Not Found"){
+        if(dao.clienteAtual.getAcademia() == null){
             sourceString = "<b>Você ainda não se <br/>filiou a uma academia</b>";
         }
 
