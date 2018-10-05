@@ -19,12 +19,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -55,8 +58,9 @@ public class AcademiaFragment extends Fragment {
     private TextView atual;
     private AlertDialog alerta;
     private com.android.volley.RequestQueue requestQueue;
+    private JsonObjectRequest jsonRequest;
     private String epQuery = "/services/data/v43.0/query/?q=";
-    private String epAcademia = "/services/data/v43.0/sobjects/Academia__c";
+    private String epCliente = "/services/data/v43.0/sobjects/Cliente__c";
     private String queryAcad = "q=SELECT Name, Id, nome__c, email__c, endereço__c FROM Academia__c ";
     private StringRequest request;
 
@@ -72,10 +76,12 @@ public class AcademiaFragment extends Fragment {
         listView = myView.findViewById(R.id.lista_academias);
         atual = myView.findViewById(R.id.atual);
         ClienteDAO dao = new ClienteDAO(getContext(), getView());
-        String sourceString = "<b>Você ainda não se <br/>filiou a uma academia</b>";
+
+        String sourceString = "<b>Academia:</b> " +dao.clienteAtual.getAcademia();
         if(dao.clienteAtual.getAcademia() == "Not Found"){
-           sourceString = "<b>Academia:</b> " +dao.clienteAtual.getAcademia();
+            sourceString = "<b>Você ainda não se <br/>filiou a uma academia</b>";
         }
+
         atual.setText(Html.fromHtml(sourceString));
         academias = new ArrayList<Academia>();
 
@@ -94,9 +100,7 @@ public class AcademiaFragment extends Fragment {
                 builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String sourceString = "<b>Academia:</b> " + academias.get(position).getNome();
-                        atual.setText(Html.fromHtml(sourceString));
-                        Snackbar.make(myView, "Academia alterada com sucesso!", Snackbar.LENGTH_SHORT).show();
+                        atualizarAcademiaFiliada(academias.get(position));
                     }
                 });
                 builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
@@ -113,6 +117,46 @@ public class AcademiaFragment extends Fragment {
         });
 
         return myView;
+    }
+
+    private void atualizarAcademiaFiliada(final Academia academia) {
+        requestQueue = com.android.volley.toolbox.Volley.newRequestQueue(getContext());
+
+        JSONObject jsonObject = new JSONObject();
+        try{
+            jsonObject.put("Academia__c", academia.getIdSf());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.i("JOAO", jsonObject.toString());
+
+
+        jsonRequest = new JsonObjectRequest(Request.Method.PATCH, Conexao.instanceURL + epCliente + "/" + Conexao.clientID, jsonObject, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+                Snackbar.make(myView, "Academia alterada com sucesso!", Snackbar.LENGTH_SHORT).show();
+                String sourceString = "<b>Academia:</b> " + academia.getNome();
+                atual.setText(Html.fromHtml(sourceString));
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> header = new HashMap<String, String>();
+                header.put("Authorization", "Bearer " + Conexao.accessToken);
+                header.put("Content-Type", "application/json");
+                return header;
+            }
+        };
+
+        requestQueue.add(jsonRequest);
     }
 
     private void getAcademias() {
