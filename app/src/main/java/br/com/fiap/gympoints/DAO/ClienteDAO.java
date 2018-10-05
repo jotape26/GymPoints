@@ -3,6 +3,7 @@ package br.com.fiap.gympoints.DAO;
 import android.content.Intent;
 import android.os.StrictMode;
 import android.support.design.widget.Snackbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import com.android.volley.AuthFailureError;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -180,7 +182,7 @@ public class ClienteDAO {
         requestQueue.add(jsonRequest);
     }
 
-    public void comprarProduto(final Produto produto) {
+    public void comprarProduto(final Produto produto, final TextView txtPontos) {
         requestQueue = Volley.newRequestQueue(context);
         JSONObject jsonObject = new JSONObject();
         try{
@@ -194,6 +196,8 @@ public class ClienteDAO {
                 @Override
                 public void onResponse(JSONObject response) {
                     clienteAtual.setPontos(clienteAtual.getPontos() - produto.getPreco());
+                    String sourceString = "<b>Pontos disponiveis:</b> " + clienteAtual.getPontos() ;
+                    txtPontos.setText(Html.fromHtml(sourceString));
                     Toast.makeText(context, produto.getNome() + " comprado", Toast.LENGTH_LONG).show();
                     Log.d("Response", response.toString());
                 }

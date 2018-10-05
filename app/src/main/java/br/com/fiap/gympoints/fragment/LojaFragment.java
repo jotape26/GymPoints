@@ -96,7 +96,7 @@ public class LojaFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         ClienteDAO dao = new ClienteDAO(getContext(), view);
-                        dao.comprarProduto(produto);
+                        dao.comprarProduto(produto, txtPontos);
                     }
                 });
                 builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {

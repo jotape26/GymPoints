@@ -76,10 +76,12 @@ public class AcademiaFragment extends Fragment {
         listView = myView.findViewById(R.id.lista_academias);
         atual = myView.findViewById(R.id.atual);
         ClienteDAO dao = new ClienteDAO(getContext(), getView());
-        String sourceString = "<b>Você ainda não se <br/>filiou a uma academia</b>";
+
+        String sourceString = "<b>Academia:</b> " +dao.clienteAtual.getAcademia();
         if(dao.clienteAtual.getAcademia() == "Not Found"){
-           sourceString = "<b>Academia:</b> " +dao.clienteAtual.getAcademia();
+            sourceString = "<b>Você ainda não se <br/>filiou a uma academia</b>";
         }
+
         atual.setText(Html.fromHtml(sourceString));
         academias = new ArrayList<Academia>();
 
@@ -119,8 +121,6 @@ public class AcademiaFragment extends Fragment {
 
     private void atualizarAcademiaFiliada(final Academia academia) {
         requestQueue = com.android.volley.toolbox.Volley.newRequestQueue(getContext());
-        Log.i("JOAO", academia.getIdSf());
-        Log.i("JOAO", academia.getNome());
 
         JSONObject jsonObject = new JSONObject();
         try{
@@ -135,17 +135,16 @@ public class AcademiaFragment extends Fragment {
         jsonRequest = new JsonObjectRequest(Request.Method.PATCH, Conexao.instanceURL + epCliente + "/" + Conexao.clientID, jsonObject, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
                 Snackbar.make(myView, "Academia alterada com sucesso!", Snackbar.LENGTH_SHORT).show();
                 String sourceString = "<b>Academia:</b> " + academia.getNome();
                 atual.setText(Html.fromHtml(sourceString));
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("JOAO", "ERROU");
-                error.printStackTrace();
             }
         }){
             @Override
