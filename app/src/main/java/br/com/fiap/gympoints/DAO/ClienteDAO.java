@@ -269,6 +269,18 @@ public class ClienteDAO {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                //Pega o body e converte para String
+                NetworkResponse networkResponse = error.networkResponse;
+                if (networkResponse != null && networkResponse.data != null) {
+                    try {
+                        JSONObject json = new JSONArray(new String(networkResponse.data)).getJSONObject(0);
+                        errorSF = json.getString("message");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(context, errorSF,Toast.LENGTH_LONG).show();
+                }
             }
 
         }) {

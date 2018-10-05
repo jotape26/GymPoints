@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity
                         Log.d("Token", token);
                         if( token != "" && token.equals("validTkn")){
                                 dao.adicionarFrequencia(txt_points);
+                                getPresencas();
                                 Toast.makeText(MainActivity.this,"Token adicionado com sucesso!",Toast.LENGTH_SHORT).show();
                         }else{
                             Toast.makeText(MainActivity.this,"Insira um Token Válido!",Toast.LENGTH_SHORT).show();
@@ -246,6 +247,7 @@ public class MainActivity extends AppCompatActivity
                     JSONObject jsonResponse = new JSONObject(response);
                     // Pega o vetor que contém os registros de Frequencia na query no SF
                     JSONArray records = jsonResponse.getJSONArray("records");
+                    int size = jsonResponse.getInt("totalSize");
                     if (records.length() == 0) {
                         throw new Exception("Comece a frequentar a academia para ganhar pontos!");
                     }
@@ -265,11 +267,12 @@ public class MainActivity extends AppCompatActivity
 
                         if(!presencas.isEmpty()){
                             List<Presenca> ultimasPresencas = new ArrayList<>();
-                            for(int i = 0; i < 5; i++){
+                            for(int i = 0; i < size && i < 5; i++){
                                 if(presencas.get(i) == null){
                                     break;
+                                }else{
+                                    ultimasPresencas.add(presencas.get(i));
                                 }
-                                ultimasPresencas.add(presencas.get(i));
                             }
                             PresencaAdapter adapter = new PresencaAdapter(MainActivity.this, ultimasPresencas);
                             listView.setAdapter(adapter);
