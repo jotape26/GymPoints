@@ -101,6 +101,7 @@ public class AcademiaFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         atualizarAcademiaFiliada(academias.get(position));
+                        ClienteDAO.clienteAtual.setAcademia(academias.get(position).getNome());
                     }
                 });
                 builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
@@ -129,13 +130,11 @@ public class AcademiaFragment extends Fragment {
             e.printStackTrace();
         }
 
-        Log.i("JOAO", jsonObject.toString());
-
 
         jsonRequest = new JsonObjectRequest(Request.Method.PATCH, Conexao.instanceURL + epCliente + "/" + Conexao.clientID, jsonObject, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-
+                ClienteDAO.clienteAtual.setAcademia(academia.getNome());
             }
         }, new Response.ErrorListener() {
             @Override
